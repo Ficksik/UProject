@@ -18,10 +18,15 @@ namespace View
         private SimpleObjectsInfo _simpleObjectsInfo;
         private SimpleObjectsController _simpleObjects;
         private Transform _transform;
+        private MaterialPropertyBlock _propBlock;
+        private static readonly int ColorProp = Shader.PropertyToID("_Color");
 
         protected override void Initialize(IContainer container)
         {
             _transform = transform;
+            
+            _propBlock = new MaterialPropertyBlock();
+            _meshRenderer.GetPropertyBlock(_propBlock);
             
             var model = container.Resolve<ModelController>();
 
@@ -44,7 +49,11 @@ namespace View
                 Debug.LogError("colorInfo not found");
                 return;
             }
-            _meshRenderer.sharedMaterial.color = colorInfo.Color;
+            
+            // Assign our new value.
+            _propBlock.SetColor(ColorProp, colorInfo.Color);
+            // Apply the edited values to the renderer.
+            _meshRenderer.SetPropertyBlock(_propBlock);
         }
 
         public void CoreUpdate()
